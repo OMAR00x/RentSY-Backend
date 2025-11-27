@@ -10,7 +10,7 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::put('/users/{id}/approve', [AdminController::class, 'approveUser']);
     Route::put('/users/{id}/reject', [AdminController::class, 'rejectUser']);
 
-    Route::get('/properties/pending', [AdminController::class, 'pendingProperties']);
-    Route::put('/properties/{id}/approve', [AdminController::class, 'approveProperty']);
-    Route::put('/properties/{id}/reject', [AdminController::class, 'rejectProperty']);
+    Route::get('/apartments/pending', [AdminController::class, 'pendingApartments']);
+    Route::put('/apartments/{id}/approve', [AdminController::class, 'approveApartment']);
+    Route::put('/apartments/{id}/reject', [AdminController::class, 'rejectApartment']);
 });

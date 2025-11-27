@@ -37,12 +37,12 @@ php artisan serve
 - `POST /api/logout` - تسجيل الخروج
 
 ### العقارات
-- `GET /api/properties` - عرض جميع العقارات (مع الفلترة)
-- `GET /api/properties/{id}` - تفاصيل عقار
-- `POST /api/properties` - إضافة عقار (مؤجر فقط)
-- `GET /api/my-properties` - عقاراتي (مؤجر فقط)
-- `PUT /api/properties/{id}` - تعديل عقار
-- `DELETE /api/properties/{id}` - حذف عقار
+- `GET /api/apartments` - عرض جميع العقارات (مع الفلترة)
+- `GET /api/apartments/{id}` - تفاصيل عقار
+- `POST /api/apartments` - إضافة عقار (مؤجر فقط)
+- `GET /api/my-apartments` - عقاراتي (مؤجر فقط)
+- `PUT /api/apartments/{id}` - تعديل عقار
+- `DELETE /api/apartments/{id}` - حذف عقار
 
 ### الحجوزات
 - `POST /api/bookings` - إنشاء حجز
@@ -80,14 +80,14 @@ php artisan serve
 - `GET /api/admin/users/pending` - المستخدمين بانتظار الموافقة
 - `PUT /api/admin/users/{id}/approve` - الموافقة على مستخدم
 - `PUT /api/admin/users/{id}/reject` - رفض مستخدم
-- `GET /api/admin/properties/pending` - العقارات بانتظار الموافقة
-- `PUT /api/admin/properties/{id}/approve` - الموافقة على عقار
-- `PUT /api/admin/properties/{id}/reject` - رفض عقار
+- `GET /api/admin/apartments/pending` - العقارات بانتظار الموافقة
+- `PUT /api/admin/apartments/{id}/approve` - الموافقة على عقار
+- `PUT /api/admin/apartments/{id}/reject` - رفض عقار
 
 ## معاملات الفلترة للعقارات
 
 ```
-GET /api/properties?governorate_id=1&city_id=2&min_price=100&max_price=500&rooms=2&amenities=1,2,3&search=شقة
+GET /api/apartments?area_id=1&city_id=2&min_price=100&max_price=500&rooms=2&amenities=1,2,3&search=شقة
 ```
 
 ## ملاحظات مهمة

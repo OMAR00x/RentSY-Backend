@@ -8,11 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('property_images', function (Blueprint $table) {
+        Schema::create('apartment_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained()->onDelete('cascade');
+            $table->foreignId('apartment_id')->constrained()->onDelete('cascade');
             $table->string('url');
-            $table->boolean('is_main')->default(false);
+            $table->boolean('is_main')->default(value: true);
             $table->integer('order')->nullable();
             $table->timestamps();
         });
@@ -20,6 +20,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('property_images');
+        Schema::dropIfExists('apartment_images');
     }
 };

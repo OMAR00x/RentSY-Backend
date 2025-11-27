@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Property;
+use App\Models\Apartment;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -28,23 +28,23 @@ class AdminController extends Controller
         return response()->json(['message' => 'تم رفض المستخدم']);
     }
 
-    public function pendingProperties()
+    public function pendingApartments()
     {
-        $properties = Property::with(['owner', 'city'])->where('status', 'pending')->latest()->paginate(20);
-        return response()->json($properties);
+        $apartments = Apartment::with(['owner', 'city'])->where('status', 'pending')->latest()->paginate(20);
+        return response()->json($apartments);
     }
 
-    public function approveProperty($id)
+    public function approveApartment($id)
     {
-        $property = Property::findOrFail($id);
-        $property->update(['status' => 'active']);
+        $apartment = Apartment::findOrFail($id);
+        $apartment->update(['status' => 'active']);
         return response()->json(['message' => 'تمت الموافقة على العقار']);
     }
 
-    public function rejectProperty($id)
+    public function rejectApartment($id)
     {
-        $property = Property::findOrFail($id);
-        $property->update(['status' => 'inactive']);
+        $apartment = Apartment::findOrFail($id);
+        $apartment->update(['status' => 'inactive']);
         return response()->json(['message' => 'تم رفض العقار']);
     }
 }

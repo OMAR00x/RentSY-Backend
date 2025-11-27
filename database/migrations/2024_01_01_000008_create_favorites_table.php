@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('property_id')->constrained()->onDelete('cascade');
+            $table->foreignId('apartment_id')->constrained()->onDelete('cascade');
             $table->timestamp('created_at')->useCurrent();
-            
-            $table->unique(['user_id', 'property_id']);
+
+            $table->unique(['user_id', 'apartment_id']);
         });
     }
 

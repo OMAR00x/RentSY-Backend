@@ -12,11 +12,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('from_user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('to_user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('property_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('apartment_id')->nullable()->constrained()->onDelete('set null');
             $table->text('body');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
-            
+
             $table->index(['from_user_id', 'to_user_id', 'created_at']);
         });
     }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Favorite extends Model
 {
-    protected $fillable = ['user_id', 'property_id'];
+    protected $fillable = ['user_id', 'apartment_id'];
     public $timestamps = false;
 
     public function user(): BelongsTo
@@ -15,8 +15,8 @@ class Favorite extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function property(): BelongsTo
+    public function apartment(): BelongsTo
     {
-        return $this->belongsTo(Property::class);
+        return $this->belongsTo(apartment::class);
     }
 }

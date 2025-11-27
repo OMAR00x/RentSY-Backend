@@ -9,8 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Booking extends Model
 {
     protected $fillable = [
-        'user_id', 'property_id', 'start_date', 'end_date', 
-        'total_price', 'status', 'payment_method', 'payment_card', 'note'
+        'user_id',
+        'apartment_id',
+        'start_date',
+        'end_date',
+        'total_price',
+        'status',
+        'payment_method',
+        'payment_card',
     ];
 
     protected $casts = [
@@ -24,9 +30,9 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function property(): BelongsTo
+    public function apartment(): BelongsTo
     {
-        return $this->belongsTo(Property::class);
+        return $this->belongsTo(apartment::class);
     }
 
     public function review(): HasOne

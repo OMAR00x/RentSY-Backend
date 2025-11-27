@@ -8,12 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
-class Property extends Model
+class Apartment extends Model
 {
     protected $fillable = [
-        'owner_id', 'city_id', 'title', 'slug', 'description', 'price', 'price_type',
-        'rooms', 'baths', 'area', 'floor', 'furnished', 'has_internet',
-        'property_type', 'status', 'address'
+        'owner_id',
+        'city_id',
+        'title',
+        'description',
+        'price',
+        'price_type',
+        'rooms',
+        'status',
+        'address'
     ];
 
     protected $casts = [
@@ -26,9 +32,9 @@ class Property extends Model
     protected static function boot()
     {
         parent::boot();
-        static::creating(function ($property) {
-            if (empty($property->slug)) {
-                $property->slug = Str::slug($property->title) . '-' . Str::random(6);
+        static::creating(function ($apartment) {
+            if (empty($apartment->slug)) {
+                $apartment->slug = Str::slug($apartment->title) . '-' . Str::random(6);
             }
         });
     }
@@ -45,7 +51,7 @@ class Property extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(PropertyImage::class);
+        return $this->hasMany(ApartmentImage::class);
     }
 
     public function amenities(): BelongsToMany
@@ -75,7 +81,7 @@ class Property extends Model
             ->where(function ($query) use ($startDate, $endDate) {
                 $query->where(function ($q) use ($startDate, $endDate) {
                     $q->where('start_date', '<', $endDate)
-                      ->where('end_date', '>', $startDate);
+                        ->where('end_date', '>', $startDate);
                 });
             })
             ->exists();

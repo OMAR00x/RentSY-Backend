@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('property_amenity', function (Blueprint $table) {
-            $table->foreignId('property_id')->constrained()->onDelete('cascade');
+        Schema::create('apartment_amenity', function (Blueprint $table) {
+            $table->foreignId('apartment_id')->constrained()->onDelete('cascade');
             $table->foreignId('amenity_id')->constrained()->onDelete('cascade');
-            $table->primary(['property_id', 'amenity_id']);
+            $table->primary(['apartment_id', 'amenity_id']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('property_amenity');
+        Schema::dropIfExists('apartment_amenity');
     }
 };
