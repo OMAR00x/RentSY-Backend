@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('password');
             $table->string('avatar')->nullable();
-            $table->enum('role', ['tenant', 'owner', 'admin'])->default('tenant');
+            $table->enum('role', ['renter', 'owner', 'admin'])->default('renter');
             $table->string('id_front')->nullable();
             $table->string('id_back')->nullable();
             $table->date('birthdate')->nullable();

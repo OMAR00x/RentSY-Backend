@@ -114,6 +114,6 @@ GET /api/apartments?area_id=1&city_id=2&min_price=100&max_price=500&rooms=2&amen
    - `rejected` - مرفوض
 
 6. أدوار المستخدمين:
-   - `tenant` - مستأجر
+   - `renter` - مستأجر
    - `owner` - مؤجر
    - `admin` - أدمن
