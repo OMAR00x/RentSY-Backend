@@ -83,9 +83,9 @@ class User extends Authenticatable
         return $this->role === 'owner';
     }
 
-    public function isTenant(): bool
+    public function isRenter(): bool
     {
-        return $this->role === 'tenant';
+        return $this->role === 'renter';
     }
 
     public function isAdmin(): bool
