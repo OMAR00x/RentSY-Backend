@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\userController;
+use App\Http\Controllers\ApartmentController;
 
 
 
@@ -23,10 +24,14 @@ Route::middleware('admin')->prefix('admin')->group(function () {
 /***************** */
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
+/******************** */
+
+// Apartments Routes
 
 
-//******************** */
-Route::get('/get', [UserController::class, 'get']);
-Route::post('/create', [UserController::class, 'create']);
-Route::put('/update', [UserController::class, 'update']);
-Route::delete('/delete', [UserController::class, 'delete']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/apartments/{id}/favorite', [ApartmentController::class, 'toggleFavorite']);
+    Route::get('/favorites', [ApartmentController::class, 'favorites']);
+    Route::get('/apartments', [ApartmentController::class, 'index']);
+    Route::get('/apartments/{id}', [ApartmentController::class, 'show']);
+});

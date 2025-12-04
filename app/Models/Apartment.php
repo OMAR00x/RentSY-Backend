@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 
 class Apartment extends Model
@@ -13,6 +14,7 @@ class Apartment extends Model
     protected $fillable = [
         'owner_id',
         'city_id',
+        'area_id',
         'title',
         'description',
         'price',
@@ -49,9 +51,14 @@ class Apartment extends Model
         return $this->belongsTo(City::class);
     }
 
-    public function images(): HasMany
+    public function area(): BelongsTo
     {
-        return $this->hasMany(ApartmentImage::class);
+        return $this->belongsTo(Area::class);
+    }
+
+    public function images(): MorphMany
+    {
+        return $this->morphMany(Image::class, 'imageable');
     }
 
     public function amenities(): BelongsToMany

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -17,10 +19,7 @@ class User extends Authenticatable
         'last_name',
         'phone',
         'password',
-        'avatar',
         'role',
-        'id_front',
-        'id_back',
         'birthdate',
         'status'
     ];
@@ -76,6 +75,26 @@ class User extends Authenticatable
     public function searchHistory(): HasMany
     {
         return $this->hasMany(SearchHistory::class);
+    }
+
+    public function images(): MorphMany
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+
+    public function avatar(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('type', 'avatar');
+    }
+
+    public function idFront(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('type', 'id_front');
+    }
+
+    public function idBack(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('type', 'id_back');
     }
 
     public function isOwner(): bool

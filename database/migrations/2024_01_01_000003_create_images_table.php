@@ -8,11 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('apartment_images', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('apartment_id')->constrained()->onDelete('cascade');
+            $table->morphs('imageable');
             $table->string('url');
-            $table->boolean('is_main')->default(value: true);
+            $table->string('type')->nullable();
+            $table->boolean('is_main')->default(false);
             $table->integer('order')->nullable();
             $table->timestamps();
         });
@@ -20,6 +21,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('apartment_images');
+        Schema::dropIfExists('images');
     }
 };
