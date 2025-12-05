@@ -88,6 +88,12 @@ class UserController extends Controller
             return $this->errorResponse('حسابك قيد المراجعة، يرجى الانتظار حتى يتم الموافقة عليه', 403);
         }
 */
+
+        /*
+        if ($user->status === 'rejected') {
+            return $this->errorResponse('تم رفض حسابك', 403);
+        }
+*/
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return $this->successResponse([

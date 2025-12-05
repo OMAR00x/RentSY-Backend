@@ -14,6 +14,16 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
 
+    public function getAuthIdentifierName()
+    {
+        return 'phone';
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
+
     protected $fillable = [
         'first_name',
         'last_name',
