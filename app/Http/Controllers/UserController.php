@@ -19,18 +19,21 @@ class UserController extends Controller
                 [
                     'first_name' => 'required|string|max:255',
                     'last_name' => 'required|string|max:255',
-                    'phone' => 'required|string|unique:users',
+                    'phone' => 'required|unique:users|numeric',
                     'password' => 'required|string|min:8|confirmed',
-                    'role' => 'required|string',
-                    'avatar' => 'nullable|image|max:2048',
-                    'id_front' => 'nullable|image|max:2048',
-                    'id_back' => 'nullable|image|max:2048',
+                    'role' => 'required|string|in:renter,owner',
+                    'avatar' => 'image|max:2048',
+                    'id_front' => 'image|max:2048',
+                    'id_back' => 'image|max:2048',
                     'birthdate' => 'required|date',
                 ],
                 [
                     'phone.unique' => 'هذا الرقم مستخدم من قبل',
                     'required' => 'هذاالحقل مطلوب',
                     'date' => 'يجب ادخال تاريخ صحيح',
+                    'numeric' => 'يجب ادخال رقم صحيح',
+                    'password.confirmed' => 'كلمة السر غير متطابقة',
+                    'in' => 'القيمة المدخلة غير صحيحة',
                 ]
             );
         } catch (ValidationException $e) {
@@ -83,13 +86,15 @@ class UserController extends Controller
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             return $this->errorResponse('الرقم أو كلمة السر غير صحيحة', 401);
         }
+
+
         /*
         if ($user->status === 'pending') {
             return $this->errorResponse('حسابك قيد المراجعة، يرجى الانتظار حتى يتم الموافقة عليه', 403);
         }
-*/
 
-        /*
+
+
         if ($user->status === 'rejected') {
             return $this->errorResponse('تم رفض حسابك', 403);
         }

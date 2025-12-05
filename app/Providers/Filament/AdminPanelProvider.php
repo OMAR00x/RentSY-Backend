@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -27,8 +28,13 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(Login::class)
             ->authGuard('web')
+            ->authPasswordBroker('users')
+            ->emailVerification(false)
+            ->brandLogo(asset('storage/Logo/RentSY-Logo.png'))
+            ->brandLogoHeight('6rem')
+            ->brandName('RentSY - لوحة التحكم')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -37,9 +43,11 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
+            ->spa()
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
+                \App\Filament\Widgets\UserStatsWidget::class,
+                \App\Filament\Widgets\AdvancedStatsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

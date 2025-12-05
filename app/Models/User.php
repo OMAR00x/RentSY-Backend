@@ -9,10 +9,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Laravel\Sanctum\HasApiTokens;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable, HasApiTokens;
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isAdmin();
+    }
 
     public function getAuthIdentifierName()
     {
@@ -122,8 +129,8 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function isApproved(): bool
+    public function getNameAttribute(): string
     {
-        return $this->status === 'approved';
+        return $this->first_name . ' ' . $this->last_name;
     }
 }
