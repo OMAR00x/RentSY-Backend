@@ -44,19 +44,19 @@ class UserController extends Controller
 
         if ($request->hasFile('avatar')) {
             $user->images()->create([
-                'url' => $request->file('avatar')->store('avatars', 'public'),
+                'url' => $request->file('avatar')->store('avatars', 'private'),
                 'type' => 'avatar'
             ]);
         }
         if ($request->hasFile('id_front')) {
             $user->images()->create([
-                'url' => $request->file('id_front')->store('ids', 'public'),
+                'url' => $request->file('id_front')->store('ids', 'private'),
                 'type' => 'id_front'
             ]);
         }
         if ($request->hasFile('id_back')) {
             $user->images()->create([
-                'url' => $request->file('id_back')->store('ids', 'public'),
+                'url' => $request->file('id_back')->store('ids', 'private'),
                 'type' => 'id_back'
             ]);
         }
