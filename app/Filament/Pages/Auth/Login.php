@@ -14,7 +14,6 @@ class Login extends BaseLogin
         return $schema->components([
             $this->getPhoneFormComponent(),
             $this->getPasswordFormComponent(),
-            $this->getRememberFormComponent(),
         ]);
     }
 
