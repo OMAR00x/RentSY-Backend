@@ -12,6 +12,7 @@ class BookingController extends Controller
 {
     use ResponseTrait;
 
+    // المستأجر ينشئ حجز جديد
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -51,18 +52,23 @@ class BookingController extends Controller
         );
     }
 
+    // المستأجر يعرض حجوزاته (حالية، ملغية، سابقة)
     public function myBookings(Request $request)
     {
-        $status = $request->query('status');
+        $type = $request->query('type'); // current, cancelled, past
+        $now = now();
+        
         $query = Booking::with(['apartment.images', 'apartment.owner'])
             ->where('user_id', $request->user()->id);
 
-        if ($status === 'upcoming') {
-            $query->where('start_date', '>', now());
-        } elseif ($status === 'past') {
-            $query->where('end_date', '<', now());
-        } elseif ($status === 'cancelled') {
+        if ($type === 'current') {
+            $query->where('start_date', '<=', $now)
+                  ->where('end_date', '>=', $now)
+                  ->where('status', 'approved');
+        } elseif ($type === 'cancelled') {
             $query->where('status', 'cancelled');
+        } elseif ($type === 'past') {
+            $query->where('end_date', '<', $now);
         }
 
         $bookings = $query->latest()->paginate(10);
@@ -70,6 +76,7 @@ class BookingController extends Controller
         return response()->json($bookings);
     }
 
+    // المؤجر يعرض طلبات الحجز على شقته
     public function apartmentBookings(Request $request)
     {
         $request->validate([
@@ -91,6 +98,7 @@ class BookingController extends Controller
         return response()->json($bookings);
     }
 
+    // المؤجر يقبل أو يرفض الحجز
     public function updateStatus(Request $request, $id)
     {
         $validated = $request->validate([
@@ -112,6 +120,7 @@ class BookingController extends Controller
         );
     }
 
+    // المستأجر يعدل موعد الحجز
     public function reschedule(Request $request, $id)
     {
         $validated = $request->validate([
@@ -143,8 +152,7 @@ class BookingController extends Controller
         $booking->update([
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
-            'total_price' => $totalPrice,
-            'status' => 'modified'
+            'total_price' => $totalPrice
         ]);
 
         return $this->successResponse(
@@ -153,6 +161,7 @@ class BookingController extends Controller
         );
     }
 
+    // المستأجر يلغي الحجز
     public function cancel(Request $request, $id)
     {
         $booking = Booking::findOrFail($id);
@@ -167,9 +176,6 @@ class BookingController extends Controller
 
         $booking->update(['status' => 'cancelled']);
 
-        return $this->successResponse(
-            $booking,
-            'تم إلغاء الحجز'
-        );
+        return $this->successResponse($booking, 'تم إلغاء الحجز');
     }
 }

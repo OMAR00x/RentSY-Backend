@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Apartment;
 use App\Models\Favorite;
+use App\Models\SearchHistory;
 use Illuminate\Http\Request;
 use App\Http\Traits\ResponseTrait;
 
@@ -54,6 +55,14 @@ class ApartmentController extends Controller
                     ->orWhere('description', 'like', '%' . $request->search . '%')
                     ->orWhere('address', 'like', '%' . $request->search . '%');
             });
+
+            // حفظ البحث في السجل
+            if ($request->user()) {
+                SearchHistory::create([
+                    'user_id' => $request->user()->id,
+                    'query' => $request->search
+                ]);
+            }
         }
 
         $apartments = $query->latest()->paginate(10);

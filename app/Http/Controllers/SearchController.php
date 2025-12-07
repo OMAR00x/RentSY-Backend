@@ -20,20 +20,6 @@ class SearchController extends Controller
         return response()->json($searches);
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'query' => 'required|string|max:255'
-        ]);
-
-        SearchHistory::create([
-            'user_id' => $request->user()->id,
-            'query' => $validated['query']
-        ]);
-
-        return $this->successResponse(null, 'تم حفظ البحث', 201);
-    }
-
     public function delete(Request $request, $id)
     {
         $search = SearchHistory::findOrFail($id);

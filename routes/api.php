@@ -15,21 +15,18 @@ use App\Http\Controllers\AmenityController;
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
 
-
 Route::middleware('auth:sanctum')->group(function () {
 
     // Apartments
     Route::get('/apartments', [ApartmentController::class, 'index']);
     Route::get('/apartments/{id}', [ApartmentController::class, 'show']);
 
-    // Reviews
-    Route::post('/reviews', [ReviewController::class, 'store']);
-    Route::get('/apartments/{id}/reviews', [ReviewController::class, 'apartmentReviews']);
 
-    //  Data
+    // Data
     Route::get('/cities', [CityController::class, 'index']);
     Route::get('/cities/{id}/areas', [CityController::class, 'areas']);
     Route::get('/amenities', [AmenityController::class, 'index']);
+
 
     // User
     Route::get('/profile', [UserController::class, 'profile']);
@@ -40,24 +37,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/apartments/{id}/favorite', [ApartmentController::class, 'toggleFavorite']);
     Route::get('/favorites', [ApartmentController::class, 'favorites']);
 
-    // Owner Apartments
+    // Owner - Apartments Management
     Route::get('/my-apartments', [ApartmentController::class, 'ownerApartments']);
     Route::post('/apartments', [ApartmentController::class, 'store']);
     Route::put('/apartments/{id}', [ApartmentController::class, 'update']);
     Route::delete('/apartments/{id}', [ApartmentController::class, 'destroy']);
 
-    // Bookings
-    Route::post('/bookings', [BookingController::class, 'store']);
-    Route::get('/my-bookings', [BookingController::class, 'myBookings']);
+    // Owner - Booking Requests
     Route::get('/apartment-bookings', [BookingController::class, 'apartmentBookings']);
     Route::put('/bookings/{id}/status', [BookingController::class, 'updateStatus']);
+
+    // Renter - Bookings
+    Route::post('/bookings', [BookingController::class, 'store']);
+    Route::get('/my-bookings', [BookingController::class, 'myBookings']);
     Route::put('/bookings/{id}/reschedule', [BookingController::class, 'reschedule']);
     Route::delete('/bookings/{id}', [BookingController::class, 'cancel']);
 
+    // Reviews
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::get('/apartments/{id}/reviews', [ReviewController::class, 'apartmentReviews']);
 
     // Search History
     Route::get('/search-history', [SearchController::class, 'history']);
-    Route::post('/search-history', [SearchController::class, 'store']);
     Route::delete('/search-history/{id}', [SearchController::class, 'delete']);
     Route::delete('/search-history', [SearchController::class, 'clear']);
 
@@ -69,6 +70,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
-    Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
 });
