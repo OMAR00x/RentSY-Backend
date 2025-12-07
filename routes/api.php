@@ -6,20 +6,13 @@ use App\Http\Controllers\userController;
 use App\Http\Controllers\ApartmentController;
 
 
-
-
-
-
-
-
-
 /***************** */
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
 /******************** */
 
-// Apartments Routes
 
+// Apartments Routes
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/apartments/{id}/favorite', [ApartmentController::class, 'toggleFavorite']);
