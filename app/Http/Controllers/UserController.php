@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Traits\ResponseTrait;
 
-
 class UserController extends Controller
 {
     use ResponseTrait;
+
     public function register(Request $request)
     {
         try {
@@ -44,19 +44,19 @@ class UserController extends Controller
 
         if ($request->hasFile('avatar')) {
             $user->images()->create([
-                'url' => $request->file('avatar')->store('avatars', 'private'),
+                'url' => $request->file('avatar')->store('avatars', 'public'),
                 'type' => 'avatar'
             ]);
         }
         if ($request->hasFile('id_front')) {
             $user->images()->create([
-                'url' => $request->file('id_front')->store('ids', 'private'),
+                'url' => $request->file('id_front')->store('ids', 'public'),
                 'type' => 'id_front'
             ]);
         }
         if ($request->hasFile('id_back')) {
             $user->images()->create([
-                'url' => $request->file('id_back')->store('ids', 'private'),
+                'url' => $request->file('id_back')->store('ids', 'public'),
                 'type' => 'id_back'
             ]);
         }
@@ -65,6 +65,7 @@ class UserController extends Controller
             'user' => $user->load('avatar', 'idFront', 'idBack'),
         ], 'تم إنشاء الحساب بنجاح، حسابك قيد المراجعة وسيتم إشعارك عند الموافقة', 201);
     }
+
     public function login(Request $request)
     {
         try {
@@ -86,8 +87,6 @@ class UserController extends Controller
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             return $this->errorResponse('الرقم أو كلمة السر غير صحيحة', 401);
         }
-
-
         /*
         if ($user->status === 'pending') {
             return $this->errorResponse('حسابك قيد المراجعة، يرجى الانتظار حتى يتم الموافقة عليه', 403);
@@ -104,6 +103,57 @@ class UserController extends Controller
         return $this->successResponse([
             'user' => $user->load('avatar'),
             'token' => $token
-        ], 'User logged in successfully', 200);
+        ], 'تم تسجيل الدخول بنجاح', 200);
+    }
+
+    public function profile(Request $request)
+    {
+        $user = $request->user()->load(['avatar', 'idFront', 'idBack']);
+
+        return response()->json($user);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validated = $request->validate([
+            'first_name' => 'string|max:255',
+            'last_name' => 'string|max:255',
+            'password' => 'nullable|string|min:8|confirmed',
+            'avatar' => 'nullable|image|max:2048'
+        ]);
+
+        $user = $request->user();
+
+        if (isset($validated['first_name'])) {
+            $user->first_name = $validated['first_name'];
+        }
+        if (isset($validated['last_name'])) {
+            $user->last_name = $validated['last_name'];
+        }
+        if (isset($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        if ($request->hasFile('avatar')) {
+            $user->avatar()->delete();
+            $user->images()->create([
+                'url' => $request->file('avatar')->store('avatars', 'private'),
+                'type' => 'avatar'
+            ]);
+        }
+
+        return $this->successResponse(
+            $user->load(['avatar', 'idFront', 'idBack']),
+            'تم تحديث البروفايل بنجاح'
+        );
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return $this->successResponse(null, 'تم تسجيل الخروج بنجاح');
     }
 }

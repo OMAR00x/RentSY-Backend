@@ -25,7 +25,7 @@ class Message extends Model
 
     public function apartment(): BelongsTo
     {
-        return $this->belongsTo(apartment::class);
+        return $this->belongsTo(Apartment::class);
     }
 
     public function markAsRead(): void
