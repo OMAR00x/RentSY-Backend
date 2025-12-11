@@ -54,7 +54,36 @@ class ApartmentSeeder extends Seeder
                 'status' => 'active',
                 'address' => 'المزة، دمشق',
             ],
+            [
+                'title' => 'شقة دوبلكس فخمة',
+                'description' => 'شقة دوبلكس بطابقين مع تراس واسع',
+                'price' => 300,
+                'price_type' => 'daily',
+                'rooms' => 5,
+                'status' => 'active',
+                'address' => 'أبو رمانة، دمشق',
+            ],
+            [
+                'title' => 'استوديو حديث',
+                'description' => 'استوديو مجهز بالكامل للعزاب',
+                'price' => 100,
+                'price_type' => 'daily',
+                'rooms' => 1,
+                'status' => 'active',
+                'address' => 'الشعلان، دمشق',
+            ],
+            [
+                'title' => 'شقة عائلية واسعة',
+                'description' => 'شقة مثالية للعائلات الكبيرة',
+                'price' => 180,
+                'price_type' => 'daily',
+                'rooms' => 4,
+                'status' => 'active',
+                'address' => 'كفرسوسة، دمشق',
+            ],
         ];
+
+        $images = [1, 2, 3, 4, 1, 2, 3];
 
         foreach ($apartments as $index => $apartmentData) {
             $apartment = Apartment::create([
@@ -64,11 +93,10 @@ class ApartmentSeeder extends Seeder
                 ...$apartmentData
             ]);
 
-            $imageNumber = ($index % 4) + 1;
             Image::create([
                 'imageable_type' => Apartment::class,
                 'imageable_id' => $apartment->id,
-                'url' => "apartments/{$imageNumber}.jpg",
+                'url' => "apartments/{$images[$index]}.jpg",
                 'is_main' => true,
                 'type' => 'apartment'
             ]);
