@@ -32,15 +32,7 @@ class Apartment extends Model
         'has_internet' => 'boolean',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-        static::creating(function ($apartment) {
-            if (empty($apartment->slug)) {
-                $apartment->slug = Str::slug($apartment->title) . '-' . Str::random(6);
-            }
-        });
-    }
+
 
     public function owner(): BelongsTo
     {

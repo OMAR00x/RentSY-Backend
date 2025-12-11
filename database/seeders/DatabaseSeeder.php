@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             AmenitySeeder::class,
             AdminSeeder::class,
             AreasSeeder::class,
+            ApartmentSeeder::class,
         ]);
     }
 }

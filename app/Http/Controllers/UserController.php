@@ -110,7 +110,7 @@ class UserController extends Controller
 
     public function profile(Request $request)
     {
-        $user = $request->user()->load(['avatar', 'idFront', 'idBack']);
+        $user = $request->user()->load('avatar');
 
         return response()->json($user);
     }
@@ -121,7 +121,7 @@ class UserController extends Controller
             'first_name' => 'string|max:255',
             'last_name' => 'string|max:255',
             'password' => 'nullable|string|min:8|confirmed',
-            'avatar' => 'nullable|image|max:2048'
+            'avatar' => 'nullable|image|max:4048'
         ]);
 
         $user = $request->user();
@@ -139,16 +139,18 @@ class UserController extends Controller
         $user->save();
 
         if ($request->hasFile('avatar')) {
-            $user->avatar()->delete();
+            if ($oldAvatar = $user->avatar) {
+                Storage::disk('public')->delete($oldAvatar->url);
+                $oldAvatar->delete();
+            }
             $user->images()->create([
                 'url' => $request->file('avatar')->store('avatars', 'public'),
                 'type' => 'avatar'
             ]);
         }
 
-
         return $this->successResponse(
-            $user->load(['avatar', 'idFront', 'idBack']),
+            $user->load('avatar'),
             'تم تحديث البروفايل بنجاح'
         );
     }
