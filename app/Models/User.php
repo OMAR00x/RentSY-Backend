@@ -49,7 +49,6 @@ class User extends Authenticatable implements FilamentUser
     protected function casts(): array
     {
         return [
-            'password' => 'hashed',
             'birthdate' => 'date',
         ];
     }

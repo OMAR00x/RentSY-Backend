@@ -67,7 +67,7 @@
                     <div class="space-y-2">
                         <p class="text-xs font-medium text-gray-500 dark:text-gray-400">هوية (أمامية)</p>
                         @if($idFront)
-                            <img src="{{ asset('storage/' . $idFront->url) }}" class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700" alt="هوية">
+                            <img src="{{ url('/storage/private/' . $idFront->url) }}" class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700" alt="هوية">
                         @else
                             <div class="w-full h-32 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center">
                                 <span class="text-gray-400 text-xs">لا توجد صورة</span>
@@ -78,7 +78,7 @@
                     <div class="space-y-2">
                         <p class="text-xs font-medium text-gray-500 dark:text-gray-400">هوية (خلفية)</p>
                         @if($idBack)
-                            <img src="{{ asset('storage/' . $idBack->url) }}" class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700" alt="هوية">
+                            <img src="{{ url('/storage/private/' . $idBack->url) }}" class="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700" alt="هوية">
                         @else
                             <div class="w-full h-32 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center">
                                 <span class="text-gray-400 text-xs">لا توجد صورة</span>
