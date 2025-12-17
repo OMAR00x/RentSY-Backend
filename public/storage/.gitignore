@@ -3,3 +3,6 @@
 !/Logo
 !/avatars
 !/apartments
+
+!/apartments/*
+!/apartments/**
