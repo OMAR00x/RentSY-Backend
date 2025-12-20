@@ -13,3 +13,8 @@ Route::get('/storage/private/{path}', function ($path) {
     }
     return response()->file(Storage::disk('local')->path($path));
 })->where('path', '.*')->name('private.file');
+
+// Test Notifications Interface
+Route::get('/test-notifications', function () {
+    return view('test-notifications');
+});

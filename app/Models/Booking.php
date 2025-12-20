@@ -19,6 +19,11 @@ class Booking extends Model
         'payment_card',
     ];
 
+
+    protected $appends = [
+        'average_rating'
+    ];
+
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',

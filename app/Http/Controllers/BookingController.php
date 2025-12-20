@@ -6,6 +6,9 @@ use App\Models\Booking;
 use App\Models\Apartment;
 use Illuminate\Http\Request;
 use App\Http\Traits\ResponseTrait;
+use App\Models\User;
+use App\Services\FirebaseService;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 
 class BookingController extends Controller
@@ -45,6 +48,12 @@ class BookingController extends Controller
             'status' => 'pending'
         ]);
 
+        $userId = auth('sanctum')->user()->id;
+        $user = User::findOrFail($userId);
+        $notificationService = new NotificationService(new FirebaseService());
+        $notificationService->sendToUser($user->id, 'Welcome', 'Welcome to our app');
+
+
         return $this->successResponse(
             $booking->load(['apartment', 'user']),
             'تم إنشاء الحجز بنجاح',
@@ -57,14 +66,14 @@ class BookingController extends Controller
     {
         $type = $request->query('type'); // current, cancelled, past
         $now = now();
-        
+
         $query = Booking::with(['apartment.images', 'apartment.owner'])
             ->where('user_id', $request->user()->id);
 
         if ($type === 'current') {
             $query->where('start_date', '<=', $now)
-                  ->where('end_date', '>=', $now)
-                  ->where('status', 'approved');
+                ->where('end_date', '>=', $now)
+                ->where('status', 'approved');
         } elseif ($type === 'cancelled') {
             $query->where('status', 'cancelled');
         } elseif ($type === 'past') {

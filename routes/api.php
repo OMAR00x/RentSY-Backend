@@ -10,6 +10,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\AmenityController;
+use App\Http\Controllers\TestNotificationController;
 
 // Auth
 Route::post('/login', [UserController::class, 'login']);
@@ -70,5 +71,21 @@ Route::middleware('auth:sanctum')->group(function () {
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+
+
+    // FCM Token
+    Route::post('/fcm-token', [UserController::class, 'updateFcmToken']);
+
+    // Test Notifications (للاختبار فقط)
+    Route::prefix('test-notifications')->group(function () {
+        Route::get('/firebase-status', [TestNotificationController::class, 'testFirebase']);
+        Route::get('/check-my-token', [TestNotificationController::class, 'checkMyToken']);
+        Route::get('/users-with-tokens', [TestNotificationController::class, 'getUsersWithTokens']);
+        Route::post('/send-to-me', [TestNotificationController::class, 'sendToMe']);
+        Route::post('/send-to-user', [TestNotificationController::class, 'sendToUser']);
+        Route::post('/send-to-all', [TestNotificationController::class, 'sendToAll']);
+        Route::post('/send-custom', [TestNotificationController::class, 'sendCustom']);
+    });
 });

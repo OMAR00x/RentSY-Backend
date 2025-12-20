@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use App\Http\Traits\ResponseTrait;
+use App\Services\FirebaseService;
+use App\Services\NotificationService;
 
 class UserController extends Controller
 {
@@ -64,6 +65,9 @@ class UserController extends Controller
             ]);
         }
 
+        $notificationService = new NotificationService(new FirebaseService());
+        $notificationService->sendToUser($user->id, 'Welcome ', 'Welcome to our app');
+
         return $this->successResponse([
             'user' => $user->load('avatar', 'idFront', 'idBack'),
         ], 'تم إنشاء الحساب بنجاح، حسابك قيد المراجعة وسيتم إشعارك عند الموافقة', 201);
@@ -75,7 +79,8 @@ class UserController extends Controller
             $validated = $request->validate(
                 [
                     'phone' => 'required|string',
-                    'password' => 'required|string'
+                    'password' => 'required|string',
+                    'fcm_token' => 'nullable|string'
                 ],
                 [
                     'required' => 'هذاالحقل مطلوب',
@@ -100,11 +105,18 @@ class UserController extends Controller
             return $this->errorResponse('تم رفض حسابك', 403);
         }
 
+        if (isset($validated['fcm_token'])) {
+            $user->fcm_token = $validated['fcm_token'];
+            $user->save();
+        }
+
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return $this->successResponse([
             'user' => $user->load('avatar'),
-            'token' => $token
+            'token' => $token,
+            'fcm_token_updated' => isset($validated['fcm_token'])
         ], 'تم تسجيل الدخول بنجاح', 200);
     }
 
@@ -160,5 +172,24 @@ class UserController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return $this->successResponse(null, 'تم تسجيل الخروج بنجاح');
+    }
+    /**
+     * Update FCM Token for push notifications
+     */
+    public function updateFcmToken(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'fcm_token' => 'required|string'
+            ]);
+
+            $user = $request->user();
+            $user->fcm_token = $validated['fcm_token'];
+            $user->save();
+
+            return $this->successResponse(null, 'تم تحديث FCM Token بنجاح');
+        } catch (ValidationException $e) {
+            return $this->errorResponse($e->errors(), 422);
+        }
     }
 }

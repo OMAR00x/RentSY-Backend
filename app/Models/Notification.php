@@ -20,8 +20,8 @@ class Notification extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function markAsRead(): void
+    public function markAsRead()
     {
-        $this->update(['read_at' => now()]);
+        $this->update(['is_read' => true]);
     }
 }
