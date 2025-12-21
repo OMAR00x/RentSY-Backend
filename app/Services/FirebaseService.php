@@ -6,6 +6,7 @@ use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging;
 use Exception;
 
+
 class FirebaseService
 {
     protected ?Messaging $messaging = null;
@@ -23,7 +24,7 @@ class FirebaseService
     protected function initializeFirebase(): void
     {
         try {
-            $credentialsPath = config('firebase.credentials');
+            $credentialsPath = base_path('rent-sy-00-firebase-adminsdk-fbsvc-4ddcfa8cf4.json');
 
             if (!file_exists($credentialsPath)) {
                 $this->initError = "Firebase credentials file not found at: {$credentialsPath}";

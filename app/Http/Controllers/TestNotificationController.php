@@ -22,18 +22,26 @@ class TestNotificationController extends Controller
     /**
      * Test Firebase initialization
      */
-    public function testFirebase(NotificationService $notificationService)
+    public function testFirebase(Request $request)
     {
-        $firebaseService = app(FirebaseService::class);
+        try {
+            $firebaseService = app(FirebaseService::class);
 
-        if (!$firebaseService->isInitialized()) {
-            return $this->errorResponse(
-                'Firebase غير مهيأ: ' . $firebaseService->getInitError(),
-                500
-            );
+            if (!$firebaseService->isInitialized()) {
+                return $this->errorResponse(
+                    'Firebase غير مهيأ: ' . $firebaseService->getInitError(),
+                    500
+                );
+            }
+
+            return $this->successResponse([
+                'initialized' => true,
+                'credentials_path' => config('firebase.credentials'),
+                'project_id' => config('firebase.project_id')
+            ], 'Firebase تم تهيئته بنجاح ✓');
+        } catch (\Exception $e) {
+            return $this->errorResponse('خطأ في فحص Firebase: ' . $e->getMessage(), 500);
         }
-
-        return $this->successResponse(null, 'Firebase تم تهيئته بنجاح ✓');
     }
 
     /**
