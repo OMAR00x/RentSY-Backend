@@ -104,10 +104,10 @@ class ApartmentController extends Controller
     {
         $apartments = Apartment::with(['images', 'city'])
             ->where('owner_id', $request->user()->id)
+            ->select('id', 'title', 'address', 'price', 'price_type', 'city_id', 'status', 'created_at')
             ->latest()
-            ->paginate(10);
-
-        return response()->json($apartments);
+            ->get();
+        return $this->successResponse($apartments, 'تم جلب الشقق بنجاح');
     }
 
     public function store(Request $request)

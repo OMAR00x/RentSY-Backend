@@ -5,10 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Http\Traits\ResponseTrait;
+use App\Services\NotificationService;
 
 class MessageController extends Controller
 {
     use ResponseTrait;
+
+    protected NotificationService $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
 
     public function conversations(Request $request)
     {
@@ -72,8 +80,23 @@ class MessageController extends Controller
             'apartment_id' => $validated['apartment_id'] ?? null
         ]);
 
+        $message->load(['fromUser.avatar', 'toUser.avatar']);
+
+        // إرسال إشعار للمستخدم المستقبل
+        $this->notificationService->sendToUser(
+            $validated['to_user_id'],
+            'رسالة جديدة من ' . $request->user()->name,
+            $validated['body'],
+            [
+                'type' => 'new_message',
+                'message_id' => $message->id,
+                'from_user_id' => $request->user()->id,
+                'apartment_id' => $validated['apartment_id'] ?? null
+            ]
+        );
+
         return $this->successResponse(
-            $message->load(['fromUser.avatar', 'toUser.avatar']),
+            $message,
             'تم إرسال الرسالة',
             201
         );

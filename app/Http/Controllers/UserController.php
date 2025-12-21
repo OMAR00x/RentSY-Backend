@@ -65,8 +65,11 @@ class UserController extends Controller
             ]);
         }
 
-        $notificationService = new NotificationService(new FirebaseService());
-        $notificationService->sendToUser($user->id, 'Welcome ', 'Welcome to our app');
+        try {
+            app(NotificationService::class)->sendToUser($user->id, 'Welcome', 'Welcome to our app');
+        } catch (\Exception $e) {
+            // Log error but don't fail registration
+        }
 
         return $this->successResponse([
             'user' => $user->load('avatar', 'idFront', 'idBack'),

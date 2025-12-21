@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Notification as ModelsNotification;
+use Exception;
+use App\Models\User;
+use App\Services\FirebaseService;
+use Kreait\Firebase\Messaging\ApnsConfig;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 use Kreait\Firebase\Messaging\AndroidConfig;
-use Kreait\Firebase\Messaging\ApnsConfig;
-use App\Models\User;
-use Exception;
+use App\Models\Notification as ModelsNotification;
 
 class NotificationService
 {
