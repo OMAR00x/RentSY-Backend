@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('body');
             $table->json('data')->nullable();
-            $table->timestamp('read_at')->nullable();
+            $table->timestamp('is_read')->nullable();
             $table->timestamp('created_at')->useCurrent();
         });
     }
