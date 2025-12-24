@@ -54,7 +54,7 @@ class MessageController extends Controller
             })
             ->with(['fromUser.avatar', 'toUser.avatar'])
             ->latest()
-            ->paginate(20);
+            ->get();
 
         // Mark as read
         Message::where('to_user_id', $request->user()->id)

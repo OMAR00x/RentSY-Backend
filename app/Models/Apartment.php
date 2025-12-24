@@ -61,7 +61,7 @@ class Apartment extends Model
 
     public function amenities(): BelongsToMany
     {
-        return $this->belongsToMany(Amenity::class);
+        return $this->belongsToMany(Amenity::class, 'apartment_amenity');
     }
 
     public function bookings(): HasMany

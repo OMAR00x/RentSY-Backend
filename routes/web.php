@@ -3,9 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 Route::get('/storage/private/{path}', function ($path) {
     if (!Storage::disk('local')->exists($path)) {

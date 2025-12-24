@@ -65,14 +65,14 @@ class ApartmentController extends Controller
             }
         }
 
-        $apartments = $query->latest()->paginate(10);
+        $apartments = $query->latest()->get();
 
         if ($request->user()) {
             $favoriteIds = Favorite::where('user_id', $request->user()->id)
                 ->pluck('apartment_id')
                 ->toArray();
 
-            $apartments->getCollection()->transform(function ($apartment) use ($favoriteIds) {
+            $apartments->transform(function ($apartment) use ($favoriteIds) {
                 $apartment->is_favorite = in_array($apartment->id, $favoriteIds);
                 return $apartment;
             });
@@ -120,10 +120,10 @@ class ApartmentController extends Controller
             'area_id' => 'required|exists:areas,id',
             'rooms' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
-            'price_type' => 'required|in:daily,weekly,monthly',
-            'amenities' => 'array',
+            'price_type' => 'nullable|in:daily,weekly,monthly',
+            'amenities' => 'nullable|array',
             'amenities.*' => 'exists:amenities,id',
-            'images' => 'array|max:10',
+            'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:5120'
         ]);
 
@@ -136,7 +136,7 @@ class ApartmentController extends Controller
             'area_id' => $validated['area_id'],
             'rooms' => $validated['rooms'],
             'price' => $validated['price'],
-            'price_type' => $validated['price_type'],
+            'price_type' => $validated['price_type'] ?? 'daily',
             'status' => 'active'
         ]);
 
@@ -231,9 +231,9 @@ class ApartmentController extends Controller
             ->whereHas('favorites', function ($q) use ($request) {
                 $q->where('user_id', $request->user()->id);
             })
-            ->paginate(10);
+            ->get();
 
-        $favorites->getCollection()->transform(function ($apartment) {
+        $favorites->transform(function ($apartment) {
             $apartment->is_favorite = true;
             return $apartment;
         });

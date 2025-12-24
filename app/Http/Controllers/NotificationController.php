@@ -14,7 +14,7 @@ class NotificationController extends Controller
     {
         $notifications = Notification::where('user_id', $request->user()->id)
             ->latest()
-            ->paginate(20);
+            ->get();
 
         return response()->json($notifications);
     }

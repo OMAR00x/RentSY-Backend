@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->decimal('price', 12, 2);
-            $table->enum('price_type', ['daily'])->default('daily');
+            $table->enum('price_type', ['daily', 'weekly', 'monthly'])->default('daily');
             $table->integer('rooms');
             $table->enum('status', ['active', 'rented', 'pending'])->default('active');
             $table->string('address')->nullable();

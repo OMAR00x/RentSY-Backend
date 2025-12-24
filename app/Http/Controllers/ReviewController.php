@@ -51,7 +51,7 @@ class ReviewController extends Controller
         $reviews = Review::with(['user.avatar'])
             ->where('apartment_id', $apartmentId)
             ->latest()
-            ->paginate(10);
+            ->get();
 
         return response()->json($reviews);
     }

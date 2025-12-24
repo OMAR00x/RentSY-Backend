@@ -80,7 +80,7 @@ class BookingController extends Controller
             $query->where('end_date', '<', $now);
         }
 
-        $bookings = $query->latest()->paginate(10);
+        $bookings = $query->latest()->get();
 
         return response()->json($bookings);
     }
@@ -102,7 +102,7 @@ class BookingController extends Controller
             ->where('apartment_id', $request->apartment_id)
             ->where('status', 'pending')
             ->latest()
-            ->paginate(10);
+            ->get();
 
         return response()->json($bookings);
     }
