@@ -162,17 +162,32 @@ class BookingController extends Controller
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
         $days = $endDate->diffInDays($startDate);
-        $totalPrice = $apartment->price * $days;
+        $newTotalPrice = $apartment->price * $days;
+        $oldTotalPrice = $booking->total_price;
+        $priceDifference = $newTotalPrice - $oldTotalPrice;
+
+        if ($priceDifference > 0 && $request->user()->wallet < $priceDifference) {
+            return $this->errorResponse('رصيد المحفظة غير كافي', 400);
+        }
+
+        if ($priceDifference > 0) {
+            $request->user()->decrement('wallet', $priceDifference);
+            $apartment->owner->increment('wallet', $priceDifference);
+        } else if ($priceDifference < 0) {
+            $request->user()->increment('wallet', abs($priceDifference));
+            $apartment->owner->decrement('wallet', abs($priceDifference));
+        }
 
         $booking->update([
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
-            'total_price' => $totalPrice
+            'total_price' => $newTotalPrice,
+            'status' => 'pending'
         ]);
 
         return $this->successResponse(
             $booking->load(['apartment', 'user']),
-            'تم تعديل موعد الحجز'
+            'تم تعديل موعد الحجز ويحتاج موافقة المؤجر'
         );
     }
 
