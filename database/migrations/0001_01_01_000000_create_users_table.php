@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('role', ['renter', 'owner', 'admin'])->default('renter');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->date('birthdate')->nullable();
+            $table->decimal('wallet', 12, 2)->default(0);
             $table->string('fcm_token')->nullable();
             $table->rememberToken();
             $table->timestamps();

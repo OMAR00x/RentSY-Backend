@@ -22,8 +22,7 @@ class BookingController extends Controller
             'apartment_id' => 'required|exists:apartments,id',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
-            'payment_method' => 'required|in:cash,card',
-            'payment_card' => 'required_if:payment_method,card|string'
+            'payment_method' => 'required|in:cash,wallet',
         ]);
 
         $apartment = Apartment::findOrFail($validated['apartment_id']);
@@ -37,15 +36,20 @@ class BookingController extends Controller
         $days = $endDate->diffInDays($startDate);
         $totalPrice = $apartment->price * $days;
 
+        $renter = $request->user();
+
+        if ($renter->wallet < $totalPrice) {
+            return $this->errorResponse('رصيد المحفظة غير كافي', 400);
+        }
+
         $booking = Booking::create([
-            'user_id' => $request->user()->id,
+            'user_id' => $renter->id,
             'apartment_id' => $validated['apartment_id'],
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
             'total_price' => $totalPrice,
+            'status' => 'pending',
             'payment_method' => $validated['payment_method'],
-            'payment_card' => $validated['payment_card'] ?? null,
-            'status' => 'pending'
         ]);
 
         $userId = auth('sanctum')->user()->id;
@@ -53,6 +57,8 @@ class BookingController extends Controller
         $notificationService = new NotificationService(new FirebaseService());
         $notificationService->sendToUser($user->id, 'Welcome', 'Welcome to our app');
 
+        $renter->decrement('wallet', $totalPrice);
+        $apartment->owner->increment('wallet', $totalPrice);
 
         return $this->successResponse(
             $booking->load(['apartment', 'user']),

@@ -44,6 +44,7 @@ class UserController extends Controller
         }
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['wallet'] = $validated['role'] === 'renter' ? 1000 : 0;
         $user = User::create($validated);
 
         if ($request->hasFile('avatar')) {

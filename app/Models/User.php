@@ -39,7 +39,8 @@ class User extends Authenticatable implements FilamentUser
         'role',
         'birthdate',
         'status',
-        'fcm_token'
+        'fcm_token',
+        'wallet'
     ];
 
     protected $hidden = [
@@ -51,6 +52,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return [
             'birthdate' => 'date',
+            'wallet' => 'decimal:2',
         ];
     }
 
