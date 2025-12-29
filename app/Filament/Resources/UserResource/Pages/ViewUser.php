@@ -24,18 +24,19 @@ class ViewUser extends Page
     protected function getHeaderActions(): array
     {
         return [
+
             Action::make('approve')
                 ->label('قبول')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
-                ->action(fn () => $this->record->update(['status' => 'approved']))
-                ->visible(fn () => $this->record->status === 'pending'),
+                ->action(fn() => $this->record->update(['status' => 'approved']))
+                ->visible(fn() => $this->record->status === 'pending'),
             Action::make('reject')
                 ->label('رفض')
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
-                ->action(fn () => $this->record->update(['status' => 'rejected']))
-                ->visible(fn () => $this->record->status === 'pending'),
+                ->action(fn() => $this->record->update(['status' => 'rejected']))
+                ->visible(fn() => $this->record->status === 'pending'),
         ];
     }
 }

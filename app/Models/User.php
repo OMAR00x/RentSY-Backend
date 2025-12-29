@@ -46,6 +46,7 @@ class User extends Authenticatable implements FilamentUser
     protected $hidden = [
         'password',
         'remember_token',
+        'wallet',
     ];
 
     protected function casts(): array

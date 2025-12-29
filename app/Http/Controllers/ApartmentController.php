@@ -104,7 +104,7 @@ class ApartmentController extends Controller
     {
         $apartments = Apartment::with(['images', 'city'])
             ->where('owner_id', $request->user()->id)
-            ->select('id', 'title', 'address', 'price', 'price_type', 'city_id', 'status', 'created_at')
+            ->select('id', 'title', 'address', 'price', 'price_type', 'rooms', 'city_id', 'status', 'created_at')
             ->latest()
             ->get();
         return $this->successResponse($apartments, 'تم جلب الشقق بنجاح');
@@ -112,9 +112,14 @@ class ApartmentController extends Controller
 
     public function store(Request $request)
     {
+        // تحويل amenities من string إلى array إذا لزم الأمر
+        if ($request->has('amenities') && !is_array($request->amenities)) {
+            $request->merge(['amenities' => json_decode($request->amenities, true) ?? []]);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'address' => 'required|string',
             'city_id' => 'required|exists:cities,id',
             'area_id' => 'required|exists:areas,id',
@@ -123,8 +128,7 @@ class ApartmentController extends Controller
             'price_type' => 'nullable|in:daily,weekly,monthly',
             'amenities' => 'nullable|array',
             'amenities.*' => 'exists:amenities,id',
-            'images' => 'nullable|array|max:10',
-            'images.*' => 'image|max:5120'
+            'images.*' => 'nullable|image|max:5120'
         ]);
 
         $apartment = Apartment::create([
@@ -141,7 +145,8 @@ class ApartmentController extends Controller
         ]);
 
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
+            $images = is_array($request->file('images')) ? $request->file('images') : [$request->file('images')];
+            foreach ($images as $index => $image) {
                 $apartment->images()->create([
                     'url' => $image->store('apartments', 'public'),
                     'type' => 'apartment',

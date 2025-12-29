@@ -41,7 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Owner - Apartments Management
     Route::get('/my-apartments', [ApartmentController::class, 'ownerApartments']);
     Route::post('/apartments', [ApartmentController::class, 'store']);
-    Route::put('/apartments/{id}', [ApartmentController::class, 'update']);
+
     Route::delete('/apartments/{id}', [ApartmentController::class, 'destroy']);
 
     // Owner - Booking Requests

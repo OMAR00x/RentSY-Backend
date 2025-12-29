@@ -68,6 +68,9 @@ class ApprovedUserResource extends Resource
                     ]),
             ])
             ->recordActions([
+                \Filament\Actions\ViewAction::make()
+                    ->label('عرض التفاصيل')
+                    ->button(),
                 \Filament\Actions\Action::make('delete')
                     ->label('حذف')
                     ->button()
@@ -89,6 +92,7 @@ class ApprovedUserResource extends Resource
     {
         return [
             'index' => \App\Filament\Resources\ApprovedUserResource\Pages\ListApprovedUsers::route('/'),
+            'view' => \App\Filament\Resources\ApprovedUserResource\Pages\ViewApprovedUser::route('/{record}'),
         ];
     }
 

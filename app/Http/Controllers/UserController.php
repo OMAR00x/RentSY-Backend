@@ -127,6 +127,7 @@ class UserController extends Controller
     public function profile(Request $request)
     {
         $user = $request->user()->load('avatar');
+        $user->makeVisible('wallet');
 
         return response()->json($user);
     }
