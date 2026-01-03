@@ -19,9 +19,7 @@ class Booking extends Model
     ];
 
 
-    protected $appends = [
-        'average_rating'
-    ];
+
 
     protected $casts = [
         'start_date' => 'date',
