@@ -7,6 +7,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\AmenityController;
@@ -67,6 +68,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/conversations', [MessageController::class, 'conversations']);
     Route::get('/chat/{userId}', [MessageController::class, 'chat']);
     Route::post('/messages', [MessageController::class, 'send']);
+
+    // Chat (Real-time)
+    Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+    Route::get('/chat/messages/{apartmentId}', [ChatController::class, 'getMessages']);
+    Route::get('/chat/conversations', [ChatController::class, 'getConversations']);
+    Route::put('/chat/messages/{messageId}/read', [ChatController::class, 'markAsRead']);
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);
