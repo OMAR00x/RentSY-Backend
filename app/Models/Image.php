@@ -13,11 +13,6 @@ class Image extends Model
         'is_main' => 'boolean',
     ];
 
-    protected function getUrlAttribute($value)
-    {
-        return asset('storage/' . $value);
-    }
-
     public function imageable(): MorphTo
     {
         return $this->morphTo();
