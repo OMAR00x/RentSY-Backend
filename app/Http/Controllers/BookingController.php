@@ -6,7 +6,6 @@ use App\Models\Booking;
 use App\Models\Apartment;
 use Illuminate\Http\Request;
 use App\Http\Traits\ResponseTrait;
-use App\Models\User;
 use App\Services\FirebaseService;
 use App\Services\NotificationService;
 use Carbon\Carbon;
