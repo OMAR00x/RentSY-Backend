@@ -38,7 +38,7 @@ class BookingController extends Controller
 
         $renter = $request->user();
 
-        if ($renter->wallet < $totalPrice) {
+        if ($validated['payment_method'] === 'wallet' && $renter->wallet < $totalPrice) {
             return $this->errorResponse('رصيد المحفظة غير كافي', 400);
         }
 
@@ -52,17 +52,17 @@ class BookingController extends Controller
             'payment_method' => $validated['payment_method'],
         ]);
 
-        $userId = auth('sanctum')->user()->id;
-        $user = User::findOrFail($userId);
+        // إرسال إشعار للمالك
         $notificationService = new NotificationService(new FirebaseService());
-        $notificationService->sendToUser($user->id, 'Welcome', 'Welcome to our app');
-
-        $renter->decrement('wallet', $totalPrice);
-        $apartment->owner->increment('wallet', $totalPrice);
+        $notificationService->sendToUser(
+            $apartment->owner_id,
+            'طلب حجز جديد',
+            "لديك طلب حجز جديد من {$renter->name} للشقة {$apartment->title}"
+        );
 
         return $this->successResponse(
             $booking->load(['apartment', 'user']),
-            'تم إنشاء الحجز بنجاح',
+            'تم طلب الحجز بنجاح',
             201
         );
     }
@@ -129,6 +129,17 @@ class BookingController extends Controller
 
         $booking->update(['status' => $validated['status']]);
 
+        // خصم/إرجاع المبلغ عند الموافقة أو الرفض
+        if ($validated['status'] === 'approved' && $booking->payment_method === 'wallet') {
+            $booking->user->decrement('wallet', $booking->total_price);
+            $apartment->owner->increment('wallet', $booking->total_price);
+        }
+
+        // إرسال إشعار للمستأجر
+        $notificationService = new NotificationService(new FirebaseService());
+        $message = $validated['status'] === 'approved' ? 'تم قبول حجزك' : 'تم رفض حجزك';
+        $notificationService->sendToUser($booking->user_id, $message, "حجزك للشقة {$apartment->title}");
+
         return $this->successResponse(
             $booking->load(['apartment', 'user']),
             'تم تحديث حالة الحجز'
@@ -155,7 +166,7 @@ class BookingController extends Controller
 
         $apartment = $booking->apartment;
 
-        if (!$apartment->isAvailable($validated['start_date'], $validated['end_date'])) {
+        if (!$apartment->isAvailable($validated['start_date'], $validated['end_date'], $booking->id)) {
             return $this->errorResponse('الشقة غير متاحة في الفترة الجديدة', 409);
         }
 
@@ -163,20 +174,6 @@ class BookingController extends Controller
         $endDate = Carbon::parse($validated['end_date']);
         $days = $endDate->diffInDays($startDate);
         $newTotalPrice = $apartment->price * $days;
-        $oldTotalPrice = $booking->total_price;
-        $priceDifference = $newTotalPrice - $oldTotalPrice;
-
-        if ($priceDifference > 0 && $request->user()->wallet < $priceDifference) {
-            return $this->errorResponse('رصيد المحفظة غير كافي', 400);
-        }
-
-        if ($priceDifference > 0) {
-            $request->user()->decrement('wallet', $priceDifference);
-            $apartment->owner->increment('wallet', $priceDifference);
-        } else if ($priceDifference < 0) {
-            $request->user()->increment('wallet', abs($priceDifference));
-            $apartment->owner->decrement('wallet', abs($priceDifference));
-        }
 
         $booking->update([
             'start_date' => $validated['start_date'],
@@ -184,6 +181,14 @@ class BookingController extends Controller
             'total_price' => $newTotalPrice,
             'status' => 'pending'
         ]);
+
+        // إرسال إشعار للمالك
+        $notificationService = new NotificationService(new FirebaseService());
+        $notificationService->sendToUser(
+            $apartment->owner_id,
+            'طلب تعديل حجز',
+            "لديك طلب تعديل حجز من {$request->user()->name} للشقة {$apartment->title}"
+        );
 
         return $this->successResponse(
             $booking->load(['apartment', 'user']),
