@@ -6,7 +6,6 @@ use App\Http\Controllers\ApartmentController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CityController;
@@ -62,11 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/search-history', [SearchController::class, 'history']);
     Route::delete('/search-history/{id}', [SearchController::class, 'delete']);
     Route::delete('/search-history', [SearchController::class, 'clear']);
-
-    // Messages
-    Route::get('/conversations', [MessageController::class, 'conversations']);
-    Route::get('/chat/{userId}', [MessageController::class, 'chat']);
-    Route::post('/messages', [MessageController::class, 'send']);
 
     // Chat (Real-time)
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);

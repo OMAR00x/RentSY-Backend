@@ -10,9 +10,7 @@ use Illuminate\Http\Request;
 
 class ChatController extends Controller
 {
-    public function __construct(private NotificationService $notificationService)
-    {
-    }
+    public function __construct(private NotificationService $notificationService) {}
 
     public function sendMessage(Request $request)
     {
@@ -33,7 +31,7 @@ class ChatController extends Controller
         broadcast(new MessageSent($message))->toOthers();
 
         // إرسال إشعار Firebase
-        $this->notificationService->sendNotification(
+        $this->notificationService->sendToUser(
             $request->to_user_id,
             'رسالة جديدة',
             $request->user()->name . ': ' . $request->body,
@@ -75,8 +73,8 @@ class ChatController extends Controller
             ->groupBy('apartment_id')
             ->map(function ($messages) use ($userId) {
                 $lastMessage = $messages->first();
-                $otherUser = $lastMessage->from_user_id === $userId 
-                    ? $lastMessage->toUser 
+                $otherUser = $lastMessage->from_user_id === $userId
+                    ? $lastMessage->toUser
                     : $lastMessage->fromUser;
 
                 return [
