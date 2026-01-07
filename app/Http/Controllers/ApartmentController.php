@@ -105,6 +105,7 @@ class ApartmentController extends Controller
         $apartments = Apartment::with(['images', 'city'])
             ->where('owner_id', $request->user()->id)
             ->select('id', 'title', 'address', 'price', 'price_type', 'rooms', 'city_id', 'status', 'created_at')
+            ->withCount('favorites')
             ->latest()
             ->get();
         return $this->successResponse($apartments, 'تم جلب الشقق بنجاح');
