@@ -1,11 +1,3 @@
 <?php
 
-use Illuminate\Support\Facades\Broadcast;
-
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
-
-Broadcast::channel('chat.{apartmentId}', function ($user, $apartmentId) {
-    return true;
-});
+// Channels not needed - using Firebase for real-time messaging

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\Apartment;
 use App\Services\NotificationService;
@@ -27,22 +26,28 @@ class ChatController extends Controller
             'body' => $request->body,
         ]);
 
-        $message->load('fromUser', 'apartment');
-        broadcast(new MessageSent($message))->toOthers();
+        $message->load('fromUser.avatar', 'toUser.avatar', 'apartment');
 
-        // إرسال إشعار Firebase
+        // إرسال إشعار Firebase مع بيانات الرسالة
         $this->notificationService->sendToUser(
             $request->to_user_id,
-            'رسالة جديدة',
-            $request->user()->name . ': ' . $request->body,
+            'رسالة جديدة من ' . $request->user()->name,
+            $request->body,
             [
                 'type' => 'new_message',
+                'message_id' => $message->id,
                 'apartment_id' => $request->apartment_id,
                 'from_user_id' => $request->user()->id,
+                'from_user_name' => $request->user()->name,
+                'body' => $request->body,
+                'created_at' => $message->created_at->toISOString(),
             ]
         );
 
-        return response()->json($message, 201);
+        return response()->json([
+            'success' => true,
+            'message' => $message
+        ], 201);
     }
 
     public function getMessages(Request $request, $apartmentId)
@@ -54,9 +59,15 @@ class ChatController extends Controller
                 $query->where('from_user_id', $userId)
                     ->orWhere('to_user_id', $userId);
             })
-            ->with(['fromUser', 'toUser'])
+            ->with(['fromUser.avatar', 'toUser.avatar'])
             ->orderBy('created_at', 'asc')
             ->get();
+
+        // تعليم الرسائل كمقروءة
+        Message::where('apartment_id', $apartmentId)
+            ->where('to_user_id', $userId)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         return response()->json($messages);
     }
@@ -67,7 +78,7 @@ class ChatController extends Controller
 
         $conversations = Message::where('from_user_id', $userId)
             ->orWhere('to_user_id', $userId)
-            ->with(['fromUser', 'toUser', 'apartment'])
+            ->with(['fromUser.avatar', 'toUser.avatar', 'apartment.images'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->groupBy('apartment_id')
@@ -77,13 +88,21 @@ class ChatController extends Controller
                     ? $lastMessage->toUser
                     : $lastMessage->fromUser;
 
+                $unreadCount = $messages->where('to_user_id', $userId)
+                    ->whereNull('read_at')
+                    ->count();
+
                 return [
+                    'apartment_id' => $lastMessage->apartment_id,
                     'apartment' => $lastMessage->apartment,
                     'other_user' => $otherUser,
-                    'last_message' => $lastMessage,
-                    'unread_count' => $messages->where('to_user_id', $userId)
-                        ->whereNull('read_at')
-                        ->count(),
+                    'last_message' => [
+                        'id' => $lastMessage->id,
+                        'body' => $lastMessage->body,
+                        'created_at' => $lastMessage->created_at,
+                        'is_mine' => $lastMessage->from_user_id === $userId,
+                    ],
+                    'unread_count' => $unreadCount,
                 ];
             })
             ->values();
