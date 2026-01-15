@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/search-history/{id}', [SearchController::class, 'delete']);
     Route::delete('/search-history', [SearchController::class, 'clear']);
 
-    // Chat (Real-time)
+    // Chat
     Route::post('/chat/send', [ChatController::class, 'sendMessage']);
     Route::get('/chat/messages/{apartmentId}', [ChatController::class, 'getMessages']);
     Route::get('/chat/conversations', [ChatController::class, 'getConversations']);
