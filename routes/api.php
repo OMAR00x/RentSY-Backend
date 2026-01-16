@@ -67,7 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/chat/messages/{apartmentId}', [ChatController::class, 'getMessages']);
     Route::get('/chat/conversations', [ChatController::class, 'getConversations']);
     Route::post('/chat/mark-read/{apartmentId}', [ChatController::class, 'markAsRead']);
-    Route::put('/chat/messages/{messageId}/read', [ChatController::class, 'markMessageAsRead']);
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);

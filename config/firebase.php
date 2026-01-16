@@ -19,5 +19,5 @@ return [
     | Your Firebase project ID
     |
     */
-    'project_id' => env('FIREBASE_PROJECT_ID', 'rent-sy-00'),
+    'project_id' => env('FIREBASE_PROJECT_ID', 'rent-sy-721c8'),
 ];

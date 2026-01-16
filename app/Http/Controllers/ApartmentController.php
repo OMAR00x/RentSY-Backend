@@ -113,7 +113,6 @@ class ApartmentController extends Controller
 
     public function store(Request $request)
     {
-        // تحويل amenities من string إلى array إذا لزم الأمر
         if ($request->has('amenities') && !is_array($request->amenities)) {
             $request->merge(['amenities' => json_decode($request->amenities, true) ?? []]);
         }

@@ -145,17 +145,4 @@ class ChatController extends Controller
             return response()->json(['error' => 'Failed to load conversations'], 500);
         }
     }
-
-    public function markMessageAsRead(Request $request, $messageId)
-    {
-        $message = Message::findOrFail($messageId);
-
-        if ($message->to_user_id !== $request->user()->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $message->markAsRead();
-
-        return response()->json(['success' => true]);
-    }
 }

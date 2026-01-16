@@ -15,7 +15,6 @@ class BookingController extends Controller
 {
     use ResponseTrait;
 
-    // المستأجر ينشئ حجز جديد
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -53,7 +52,6 @@ class BookingController extends Controller
 
         $renter->decrement('wallet', $totalPrice);
 
-        // إرسال إشعار للمالك
         try {
             $notificationService = new NotificationService(new FirebaseService());
             $notificationService->sendToUser(
@@ -77,7 +75,6 @@ class BookingController extends Controller
         );
     }
 
-    // المستأجر يعرض حجوزاته (حالية، ملغية، سابقة)
     public function myBookings(Request $request)
     {
         $type = $request->query('type'); // current, cancelled, past
@@ -101,7 +98,6 @@ class BookingController extends Controller
         return response()->json($bookings);
     }
 
-    // المؤجر يعرض طلبات الحجز على شقته
     public function apartmentBookings(Request $request)
     {
         $request->validate([
@@ -123,7 +119,6 @@ class BookingController extends Controller
         return response()->json($bookings);
     }
 
-    // المؤجر يقبل أو يرفض الحجز
     public function updateStatus(Request $request, $id)
     {
         $validated = $request->validate([
@@ -139,14 +134,12 @@ class BookingController extends Controller
 
         $booking->update(['status' => $validated['status']]);
 
-        // إضافة المبلغ للمؤجر عند الموافقة أو إرجاعه للمستأجر عند الرفض
         if ($validated['status'] === 'approved') {
             $apartment->owner->increment('wallet', $booking->total_price);
         } elseif ($validated['status'] === 'rejected') {
             $booking->user->increment('wallet', $booking->total_price);
         }
 
-        // إرسال إشعار للمستأجر
         try {
             $notificationService = new NotificationService(new FirebaseService());
             $message = $validated['status'] === 'approved' ? 'تم قبول حجزك' : 'تم رفض حجزك';
@@ -170,7 +163,6 @@ class BookingController extends Controller
         );
     }
 
-    // المستأجر يعدل موعد الحجز
     public function reschedule(Request $request, $id)
     {
         $validated = $request->validate([
@@ -202,7 +194,6 @@ class BookingController extends Controller
             'status' => 'pending'
         ]);
 
-        // إرسال إشعار للمالك
         try {
             $notificationService = new NotificationService(new FirebaseService());
             $notificationService->sendToUser(
