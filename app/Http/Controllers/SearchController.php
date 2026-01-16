@@ -20,7 +20,7 @@ class SearchController extends Controller
         return response()->json($searches);
     }
 
-    public function delete(Request $request, $id)
+    /*  public function delete(Request $request, $id)
     {
         $search = SearchHistory::findOrFail($id);
 
@@ -38,5 +38,5 @@ class SearchController extends Controller
         SearchHistory::where('user_id', $request->user()->id)->delete();
 
         return $this->successResponse(null, 'تم مسح سجل البحث');
-    }
+    }*/
 }

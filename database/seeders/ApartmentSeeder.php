@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\City;
 use App\Models\Area;
 use App\Models\Image;
+use App\Models\Amenity;
 
 class ApartmentSeeder extends Seeder
 {
@@ -16,6 +17,7 @@ class ApartmentSeeder extends Seeder
         $owner = User::where('role', 'owner')->first() ?? User::first();
         $city = City::first();
         $area = Area::first();
+        $amenities = Amenity::all()->pluck('id')->toArray();
 
         $apartments = [
             [
@@ -100,6 +102,12 @@ class ApartmentSeeder extends Seeder
                 'is_main' => true,
                 'type' => 'apartment'
             ]);
+
+            // إضافة amenities عشوائية لكل شقة
+            if (!empty($amenities)) {
+                $randomAmenities = array_rand(array_flip($amenities), min(rand(2, 5), count($amenities)));
+                $apartment->amenities()->attach($randomAmenities);
+            }
         }
     }
 }

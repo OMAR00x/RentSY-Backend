@@ -67,7 +67,13 @@ class UserController extends Controller
         }
 
         try {
-            app(NotificationService::class)->sendToUser($user->id, 'Welcome', 'Welcome to our app');
+            if ($user->fcm_token) {
+                app(NotificationService::class)->sendToUser(
+                    $user->id,
+                    'مرحباً بك في RentSY',
+                    'تم إنشاء حسابك بنجاح، حسابك قيد المراجعة وسيتم إشعارك عند الموافقة'
+                );
+            }
         } catch (\Exception $e) {
             // Log error but don't fail registration
         }

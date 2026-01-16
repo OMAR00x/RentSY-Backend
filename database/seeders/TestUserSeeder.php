@@ -22,7 +22,8 @@ class TestUserSeeder extends Seeder
             'role' => 'owner',
             'birthdate' => '1990-01-01',
             'status' => 'approved',
-            'fcm_token' => 'TEST_FCM_TOKEN_OWNER_' . uniqid(),
+            'fcm_token' => null,
+
             'wallet' => 0
         ]);
 
@@ -34,8 +35,9 @@ class TestUserSeeder extends Seeder
             'role' => 'renter',
             'birthdate' => '1995-05-15',
             'status' => 'approved',
-            'fcm_token' => 'TEST_FCM_TOKEN_RENTER_' . uniqid(),
-            'wallet' => 1000
+            'fcm_token' => null,
+
+            'wallet' => 10000
         ]);
 
         User::create([
@@ -50,11 +52,6 @@ class TestUserSeeder extends Seeder
             'wallet' => 0
         ]);
 
-        $this->command->info('✅ تم إنشاء 3 مستخدمين تجريبيين بنجاح!');
-        $this->command->info('📱 المستخدمين:');
-        $this->command->info('   1. أحمد محمد (Owner) - 0911111111 - له FCM token');
-        $this->command->info('   2. سارة علي (Renter) - 0922222222 - لها FCM token');
-        $this->command->info('   3. خالد أحمد (Owner) - 0933333333 - بدون FCM token');
-        $this->command->info('🔑 كلمة المرور للجميع: password123');
+        $this->command->info(' تم إنشاء 3 مستخدمين تجريبيين بنجاح!');
     }
 }

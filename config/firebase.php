@@ -9,7 +9,7 @@ return [
     | Path to your Firebase service account credentials JSON file
     |
     */
-    'credentials' => env('FIREBASE_CREDENTIALS', base_path('rent-sy-00-firebase-adminsdk-fbsvc-4ddcfa8cf4.json')),
+    'credentials' => env('FIREBASE_CREDENTIALS', base_path('rentsy-721c8-firebase-adminsdk-fbsvc-a8ac04453d.json')),
 
     /*
     |--------------------------------------------------------------------------

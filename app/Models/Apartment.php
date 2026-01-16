@@ -79,16 +79,21 @@ class Apartment extends Model
         return $this->hasMany(Favorite::class);
     }
 
-    public function isAvailable($startDate, $endDate): bool
+    public function isAvailable($startDate, $endDate, $excludeBookingId = null): bool
     {
-        return !$this->bookings()
+        $query = $this->bookings()
             ->whereIn('status', ['approved', 'pending'])
             ->where(function ($query) use ($startDate, $endDate) {
                 $query->where(function ($q) use ($startDate, $endDate) {
                     $q->where('start_date', '<', $endDate)
                         ->where('end_date', '>', $startDate);
                 });
-            })
-            ->exists();
+            });
+
+        if ($excludeBookingId) {
+            $query->where('id', '!=', $excludeBookingId);
+        }
+
+        return !$query->exists();
     }
 }

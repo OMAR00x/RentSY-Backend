@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Notification extends Model
 {
     protected $fillable = ['user_id', 'title', 'body', 'data', 'read_at'];
-    public $timestamps = false;
 
     protected $casts = [
         'data' => 'array',
@@ -22,6 +21,6 @@ class Notification extends Model
 
     public function markAsRead()
     {
-        $this->update(['is_read' => true]);
+        $this->update(['read_at' => now()]);
     }
 }

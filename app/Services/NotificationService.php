@@ -144,18 +144,20 @@ class NotificationService
         }
 
         if (!$user->fcm_token) {
+            \Log::warning("User {$userId} has no FCM token");
             return [
                 'success' => false,
                 'error' => 'User has no FCM token'
             ];
         }
 
-        $storeNotifications = ModelsNotification::create([
+        ModelsNotification::create([
             'user_id' => $userId,
             'title' => $title,
             'body' => $body,
             'data' => $data,
         ]);
+        
         return $this->sendToDevice($user->fcm_token, $title, $body, $data);
     }
 

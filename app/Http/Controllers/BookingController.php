@@ -21,7 +21,6 @@ class BookingController extends Controller
             'apartment_id' => 'required|exists:apartments,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
-            'payment_method' => 'required|in:cash,wallet',
         ]);
 
         $apartment = Apartment::findOrFail($validated['apartment_id']);
@@ -32,12 +31,12 @@ class BookingController extends Controller
 
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
-        $days = $endDate->diffInDays($startDate);
+        $days = $startDate->diffInDays($endDate);
         $totalPrice = $apartment->price * $days;
 
         $renter = $request->user();
 
-        if ($validated['payment_method'] === 'wallet' && $renter->wallet < $totalPrice) {
+        if ($renter->wallet < $totalPrice) {
             return $this->errorResponse('رصيد المحفظة غير كافي', 400);
         }
 
@@ -48,16 +47,27 @@ class BookingController extends Controller
             'end_date' => $validated['end_date'],
             'total_price' => $totalPrice,
             'status' => 'pending',
-            'payment_method' => $validated['payment_method'],
+            'payment_method' => 'wallet',
         ]);
 
+        $renter->decrement('wallet', $totalPrice);
+
         // إرسال إشعار للمالك
-        $notificationService = new NotificationService(new FirebaseService());
-        $notificationService->sendToUser(
-            $apartment->owner_id,
-            'طلب حجز جديد',
-            "لديك طلب حجز جديد من {$renter->name} للشقة {$apartment->title}"
-        );
+        try {
+            $notificationService = new NotificationService(new FirebaseService());
+            $notificationService->sendToUser(
+                $apartment->owner_id,
+                'طلب حجز جديد',
+                "لديك طلب حجز جديد من {$renter->name} للشقة {$apartment->title}",
+                [
+                    'type' => 'new_booking',
+                    'booking_id' => $booking->id,
+                    'apartment_id' => $apartment->id,
+                ]
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to send booking notification: ' . $e->getMessage());
+        }
 
         return $this->successResponse(
             $booking->load(['apartment', 'user']),
@@ -128,16 +138,30 @@ class BookingController extends Controller
 
         $booking->update(['status' => $validated['status']]);
 
-        // خصم/إرجاع المبلغ عند الموافقة أو الرفض
-        if ($validated['status'] === 'approved' && $booking->payment_method === 'wallet') {
-            $booking->user->decrement('wallet', $booking->total_price);
+        // إضافة المبلغ للمؤجر عند الموافقة أو إرجاعه للمستأجر عند الرفض
+        if ($validated['status'] === 'approved') {
             $apartment->owner->increment('wallet', $booking->total_price);
+        } elseif ($validated['status'] === 'rejected') {
+            $booking->user->increment('wallet', $booking->total_price);
         }
 
         // إرسال إشعار للمستأجر
-        $notificationService = new NotificationService(new FirebaseService());
-        $message = $validated['status'] === 'approved' ? 'تم قبول حجزك' : 'تم رفض حجزك';
-        $notificationService->sendToUser($booking->user_id, $message, "حجزك للشقة {$apartment->title}");
+        try {
+            $notificationService = new NotificationService(new FirebaseService());
+            $message = $validated['status'] === 'approved' ? 'تم قبول حجزك' : 'تم رفض حجزك';
+            $notificationService->sendToUser(
+                $booking->user_id,
+                $message,
+                "حجزك للشقة {$apartment->title}",
+                [
+                    'type' => 'booking_status',
+                    'booking_id' => $booking->id,
+                    'status' => $validated['status'],
+                ]
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to send booking status notification: ' . $e->getMessage());
+        }
 
         return $this->successResponse(
             $booking->load(['apartment', 'user']),
@@ -159,10 +183,6 @@ class BookingController extends Controller
             return $this->errorResponse('غير مصرح لك بتعديل هذا الحجز', 403);
         }
 
-        if ($booking->status !== 'approved') {
-            return $this->errorResponse('لا يمكن تعديل الحجز إلا إذا كان مقبولاً', 409);
-        }
-
         $apartment = $booking->apartment;
 
         if (!$apartment->isAvailable($validated['start_date'], $validated['end_date'], $booking->id)) {
@@ -171,7 +191,7 @@ class BookingController extends Controller
 
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
-        $days = $endDate->diffInDays($startDate);
+        $days = $startDate->diffInDays($endDate);
         $newTotalPrice = $apartment->price * $days;
 
         $booking->update([
@@ -182,12 +202,21 @@ class BookingController extends Controller
         ]);
 
         // إرسال إشعار للمالك
-        $notificationService = new NotificationService(new FirebaseService());
-        $notificationService->sendToUser(
-            $apartment->owner_id,
-            'طلب تعديل حجز',
-            "لديك طلب تعديل حجز من {$request->user()->name} للشقة {$apartment->title}"
-        );
+        try {
+            $notificationService = new NotificationService(new FirebaseService());
+            $notificationService->sendToUser(
+                $apartment->owner_id,
+                'طلب تعديل حجز',
+                "لديك طلب تعديل حجز من {$request->user()->name} للشقة {$apartment->title}",
+                [
+                    'type' => 'booking_reschedule',
+                    'booking_id' => $booking->id,
+                    'apartment_id' => $apartment->id,
+                ]
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to send reschedule notification: ' . $e->getMessage());
+        }
 
         return $this->successResponse(
             $booking->load(['apartment', 'user']),
@@ -206,6 +235,11 @@ class BookingController extends Controller
 
         if ($booking->status === 'cancelled') {
             return $this->errorResponse('الحجز ملغى بالفعل', 409);
+        }
+
+        // إرجاع المبلغ للمستأجر
+        if ($booking->status === 'pending') {
+            $booking->user->increment('wallet', $booking->total_price);
         }
 
         $booking->update(['status' => 'cancelled']);
