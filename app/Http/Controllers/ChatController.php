@@ -84,66 +84,66 @@ class ChatController extends Controller
 
     public function getConversations(Request $request)
     {
-        $userId = $request->user()->id;
+        try {
+            $userId = $request->user()->id;
 
-        $conversations = Message::where('from_user_id', $userId)
-            ->orWhere('to_user_id', $userId)
-            ->with(['fromUser.avatar', 'toUser.avatar', 'apartment.images'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->groupBy('apartment_id')
-            ->map(function ($messages) use ($userId) {
-                $lastMessage = $messages->first();
-                $otherUser = $lastMessage->from_user_id === $userId
-                    ? $lastMessage->toUser
-                    : $lastMessage->fromUser;
+            $conversations = Message::where('from_user_id', $userId)
+                ->orWhere('to_user_id', $userId)
+                ->with(['fromUser.avatar', 'toUser.avatar', 'apartment.images'])
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->groupBy('apartment_id')
+                ->map(function ($messages) use ($userId) {
+                    $lastMessage = $messages->first();
+                    
+                    if (!$lastMessage || !$lastMessage->apartment) {
+                        return null;
+                    }
 
-                if (!$otherUser) {
-                    return null;
-                }
+                    $otherUser = $lastMessage->from_user_id === $userId
+                        ? $lastMessage->toUser
+                        : $lastMessage->fromUser;
 
-                $unreadCount = $messages->where('to_user_id', $userId)
-                    ->whereNull('read_at')
-                    ->count();
+                    if (!$otherUser) {
+                        return null;
+                    }
 
-                return [
-                    'apartment_id' => $lastMessage->apartment_id,
-                    'apartment' => [
-                        'id' => $lastMessage->apartment->id,
-                        'title' => $lastMessage->apartment->title,
-                        'images' => $lastMessage->apartment->images->map(fn($img) => ['url' => $img->url]),
-                    ],
-                    'other_user' => [
-                        'id' => $otherUser->id,
-                        'first_name' => $otherUser->first_name,
-                        'last_name' => $otherUser->last_name,
-                        'avatar' => $otherUser->avatar ? ['url' => $otherUser->avatar->url] : null,
-                    ],
-                    'last_message' => [
-                        'id' => $lastMessage->id,
-                        'body' => $lastMessage->body,
-                        'created_at' => $lastMessage->created_at->toISOString(),
-                        'is_mine' => $lastMessage->from_user_id === $userId,
-                    ],
-                    'unread_count' => $unreadCount,
-                ];
-            })
-            ->filter()
-            ->values();
+                    $unreadCount = $messages->where('to_user_id', $userId)
+                        ->whereNull('read_at')
+                        ->count();
 
-        return response()->json($conversations);
-    }
+                    return [
+                        'apartment_id' => $lastMessage->apartment_id,
+                        'apartment' => [
+                            'id' => $lastMessage->apartment->id,
+                            'title' => $lastMessage->apartment->title ?? '',
+                            'images' => $lastMessage->apartment->images->map(function($img) {
+                                return ['url' => $img->url ?? ''];
+                            })->toArray(),
+                        ],
+                        'other_user' => [
+                            'id' => $otherUser->id,
+                            'first_name' => $otherUser->first_name ?? '',
+                            'last_name' => $otherUser->last_name ?? '',
+                            'avatar' => $otherUser->avatar ? ['url' => $otherUser->avatar->url ?? ''] : null,
+                        ],
+                        'last_message' => [
+                            'id' => $lastMessage->id,
+                            'body' => $lastMessage->body ?? '',
+                            'created_at' => $lastMessage->created_at->toISOString(),
+                            'is_mine' => $lastMessage->from_user_id === $userId,
+                        ],
+                        'unread_count' => $unreadCount,
+                    ];
+                })
+                ->filter()
+                ->values();
 
-    public function markAsRead(Request $request, $apartmentId)
-    {
-        $userId = $request->user()->id;
-
-        Message::where('apartment_id', $apartmentId)
-            ->where('to_user_id', $userId)
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
-
-        return response()->json(['success' => true]);
+            return response()->json($conversations);
+        } catch (\Exception $e) {
+            \Log::error('Error in getConversations: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load conversations'], 500);
+        }
     }
 
     public function markMessageAsRead(Request $request, $messageId)

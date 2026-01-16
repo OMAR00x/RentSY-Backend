@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('end_date');
             $table->decimal('total_price', 12, 2);
             $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled', 'completed'])->default('pending');
-            $table->enum('payment_method', ['cash', 'wallet'])->default('cash');
+            $table->enum('payment_method', ['cash', 'wallet'])->default('wallet');
             $table->timestamps();
             $table->index(['apartment_id', 'start_date', 'end_date', 'status']);
         });

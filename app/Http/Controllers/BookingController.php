@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use App\Models\Booking;
 use App\Models\Apartment;
 use Illuminate\Http\Request;
-use App\Http\Traits\ResponseTrait;
 use App\Services\FirebaseService;
+use App\Http\Traits\ResponseTrait;
 use App\Services\NotificationService;
-use Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -66,7 +67,7 @@ class BookingController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            \Log::error('Failed to send booking notification: ' . $e->getMessage());
+            Log::error('Failed to send reschedule notification: ' . $e->getMessage());
         }
 
         return $this->successResponse(
@@ -160,7 +161,7 @@ class BookingController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            \Log::error('Failed to send booking status notification: ' . $e->getMessage());
+            Log::error('Failed to send booking status notification: ' . $e->getMessage());
         }
 
         return $this->successResponse(
@@ -215,7 +216,7 @@ class BookingController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            \Log::error('Failed to send reschedule notification: ' . $e->getMessage());
+            Log::error('Failed to send reschedule notification: ' . $e->getMessage());
         }
 
         return $this->successResponse(

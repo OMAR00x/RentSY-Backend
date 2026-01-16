@@ -55,7 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Reviews
     Route::post('/reviews', [ReviewController::class, 'store']);
-    Route::get('/apartments/{id}/reviews', [ReviewController::class, 'apartmentReviews']);
+    //Route::get('/apartments/{id}/reviews', [ReviewController::class, 'apartmentReviews']);
 
     // Search History
     Route::get('/search-history', [SearchController::class, 'history']);

@@ -46,7 +46,7 @@ class ReviewController extends Controller
         );
     }
 
-    public function apartmentReviews($apartmentId)
+    /* public function apartmentReviews($apartmentId)
     {
         $reviews = Review::with(['user.avatar'])
             ->where('apartment_id', $apartmentId)
@@ -54,5 +54,5 @@ class ReviewController extends Controller
             ->get();
 
         return response()->json($reviews);
-    }
+    }*/
 }
